@@ -1,0 +1,45 @@
+{#- get dict of user configurations -#}
+{%- set skhd = salt['pillar.get']('tool:skhd', {'users': {}}, merge=True) -%}
+{%- set users = {} -%}
+
+{%- set brew_user = salt['cmd.run_stdout']('id -F $(stat -f %u /opt/homebrew/bin/brew)', python_shell=True) %}
+
+{%- do skhd.update({'_brew_user': brew_user}) -%}
+
+{#- rejectattr filter does not fit with mapping. need to filter out users before merging default values -#}
+{%- for tool_user, tool_user_conf in salt['pillar.get']('tool:users', {}).items() -%}
+{#- by default, install tool if it was targeted. explicitly deny for a specific user to override -#}
+  {%- if tool_user_conf.get('skhd', True) -%}
+    {%- do users.update({tool_user: salt['defaults.deepcopy'](tool_user_conf)}) -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- do salt['defaults.merge'](users, skhd.get('users', {})) -%}
+
+{#- update all user configuration for skhd with its defaults -#}
+{%- do salt['defaults.update'](users, {'skhd': skhd.get('defaults', {})}) -%}
+
+{#- embed user information that will be reused (home, primary group, shell, paths) -#}
+{%- for user in users.keys() -%}
+  {%- do users[user].update({'_skhd': {}}) -%}
+  {%- do users[user].update({'name': user}) -%}
+  {%- set user_info = salt['user.info'](user) -%}
+  {%- load_yaml as user_info -%}
+group: {{ salt['user.primary_group'](user) }}
+home: {{ user_info.home }}
+shell: {{ user_info.shell.split('/')[-1] }}
+  {%- endload -%}
+  {%- do users[user].update(salt['defaults.merge'](user_info, users[user], in_place=False)) -%}
+
+  {#- cannot use environ.get because it only has access to current env, not a specific user's -#}
+  {%- load_yaml as xdg -%}
+cache: {{ salt['cmd.run']('[ -n "$XDG_CACHE_HOME" ] && echo "${XDG_CACHE_HOME}" || echo "${HOME}/.cache"', runas=user) }}
+config: {{ salt['cmd.run']('[ -n "$XDG_CONFIG_HOME" ] && echo "${XDG_CONFIG_HOME}" || echo "${HOME}/.config"', runas=user) }}
+data: {{ salt['cmd.run']('[ -n "$XDG_DATA_HOME" ] && echo "${XDG_DATA_HOME}" || echo "${HOME}/.local/share"', runas=user) }}
+state: {{ salt['cmd.run']('[ -n "$XDG_STATE_HOME" ] && echo "${XDG_STATE_HOME}" || echo "${HOME}/.local/state"', runas=user) }}
+  {%- endload -%}
+  {%- do users[user].update({'xdg': xdg}) -%}
+  {%- do users[user]['_skhd'].update({'confdir': xdg.config ~ '/skhd'}) -%}
+{%- endfor -%}
+
+{%- do skhd.update({'users': users.values() | list}) -%}
