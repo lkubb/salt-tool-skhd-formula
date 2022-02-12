@@ -6,6 +6,7 @@ skhd is restarted:
     - runas: {{ skhd._brew_user }}
 
 {%- for user in skhd.users | selectattr('dotconfig', 'defined') | selectattr('dotconfig') | list %}
+  {%- set dotconfig = user.dotconfig if dotconfig is mapping else {} %}
 
 skhd configuration is synced for user '{{ user.name }}':
   file.recurse:
@@ -18,8 +19,11 @@ skhd configuration is synced for user '{{ user.name }}':
     - template: jinja
     - user: {{ user.name }}
     - group: {{ user.group }}
-    - file_mode: keep
-    - dir_mode: '0700'
+  {%- if dotconfig.get('file_mode') %}
+    - file_mode: '{{ dotconfig.file_mode }}'
+  {%- endif %}
+    - dir_mode: '{{ dotconfig.get('dir_mode', '0700') }}'
+    - clean: {{ dotconfig.get('clean', False) | to_bool }}
     - makedirs: True
     - watch_in:
       - skhd is restarted
