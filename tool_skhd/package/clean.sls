@@ -9,6 +9,7 @@
 include:
   - {{ sls_config_clean }}
 
+
 skhd is removed:
   pkg.removed:
     - name: {{ skhd.lookup.pkg.name }}

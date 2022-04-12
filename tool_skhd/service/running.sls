@@ -9,6 +9,7 @@
 include:
   - {{ sls_package_install }}
 
+
 skhd service is running:
   service.running:
     - name: brew services start {{ skhd.lookup.service.name }}
