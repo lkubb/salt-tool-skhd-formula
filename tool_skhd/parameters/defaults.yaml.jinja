@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # vim: ft=yaml
 #
 # Set default values.
@@ -18,7 +17,4 @@ values:
       name: skhd
     brew_user: '{{ salt["cmd.run_stdout"]("id -n -u $(stat -f \"%u\" \"$(brew --prefix)\"/bin/brew)",
       python_shell=True) }}'
-  # Just here for testing
-  added_in_defaults: defaults_value
-  winner: defaults
 ...

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "salt_tool_skhd"
+name = "tool_skhd_formula"
 version = "1.0.0"
 description = "Saltstack states to manage skhd"
 authors = ["lkubb"]

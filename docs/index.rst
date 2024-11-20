@@ -1,5 +1,5 @@
-Welcome to salt-tool-skhd-formula's documentation!
-==================================================
+Welcome to tool-skhd-formula's documentation!
+=============================================
 
 .. toctree::
    :maxdepth: 2
