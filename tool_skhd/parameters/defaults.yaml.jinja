@@ -14,7 +14,17 @@ values:
       xdg_conffile: 'skhdrc'
     rootgroup: {{ salt['cmd.run']("stat -f '%Sg' /dev/console") }}
     service:
-      name: skhd
-    brew_user: '{{ salt["cmd.run_stdout"]("id -n -u $(stat -f \"%u\" \"$(brew --prefix)\"/bin/brew)",
-      python_shell=True) }}'
+      name: com.koekeishiya.skhd
+    bin: '{{ salt["cmd.run_stdout"]("brew --prefix") | path_join("bin", "brew") }}'
+    console_user: '{{ salt["cmd.run_stdout"]('id -n -u $(stat -f "%u" /dev/console)', python_shell=True) }}'
+
+  tofs:
+    files_switch:
+      - G@id|U@users
+      - id
+      - C@roles|U@users
+      - roles
+      - G@os_family|U@users
+      - os_family
+      - U@users
 ...

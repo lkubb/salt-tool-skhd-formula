@@ -8,9 +8,18 @@
 {%- from tplroot ~ "/map.jinja" import mapdata as skhd with context %}
 
 
-skhd service is dead:
-  service.running:
-    - name: brew services stop {{ skhd.lookup.service.name }}
-    - runas: {{ skhd.lookup.brew_user }}
-    - onlyif:
-      - sudo -u {{ skhd.lookup.brew_user }} brew services list | grep -e '^skhd' | grep started
+{%- for user in skhd.users | rejectattr("skhd.autostart", "false") %}
+{%-   if user.name == skhd.lookup.console_user %}
+
+skhd service is not running:
+  service.dead:
+    - name: {{ skhd.lookup.service.name }}
+    - require_in:
+      - skhd service is ignored for user '{{ user.name }}'
+{%-   endif %}
+
+skhd service is ignored for user '{{ user.name }}':
+  file.absent:
+    - name: {{ user.home | path_join("Library", "LaunchAgents", skhd.lookup.service.name ~ ".plist") }}
+
+{%- endfor %}

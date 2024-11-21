@@ -4,10 +4,6 @@
 {%- from tplroot ~ "/map.jinja" import mapdata as skhd with context %}
 {%- from tplroot ~ "/libtofsstack.jinja" import files_switch %}
 
-skhd is restarted:
-  cmd.wait:  # noqa: 213
-    - name: brew services restart skhd
-    - runas: {{ skhd.lookup.brew_user }}
 
 {%- for user in skhd.users | selectattr("dotconfig", "defined") | selectattr("dotconfig") %}
 {%-   set dotconfig = user.dotconfig if user.dotconfig is mapping else {} %}
@@ -35,6 +31,4 @@ skhd configuration is synced for user '{{ user.name }}':
     - dir_mode: '{{ dotconfig.get("dir_mode", "0700") }}'
     - clean: {{ dotconfig.get("clean", false) | to_bool }}
     - makedirs: true
-    - watch_in:
-      - skhd is restarted
 {%- endfor %}

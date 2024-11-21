@@ -50,6 +50,17 @@ tool_global:
         # for this user (will be appended to a file relative to $HOME)
       rchook: '.config/zsh/zshrc'
 
+        # This user's configuration for this formula. Will be overridden by
+        # user-specific configuration in `tool_skhd:users`.
+        # Set this to `false` to disable configuration for this user.
+      skhd:
+          # Whether the skhd service should be installed and enabled
+          # for this user. Defaults to true.
+        autostart: true
+          # $PATH set in the user's service file.
+          # Defaults to the user's $PATH.
+        service_pathenv: null
+
 tool_skhd:
 
     # Specify an explicit version (works on most Linux distributions) or
@@ -58,12 +69,18 @@ tool_skhd:
     # (again for Linux, brew does that anyways).
   version: latest
 
+    # Default formula configuration for all users.
+  defaults:
+    autostart: default value for all users
+
     # User configuration can also be specified here in
     # `tool_skhd:users`. It will override
     # configuration sourced from `tool_global:users`.
   users:
     user:
       persistenv: '.bash_profile'
+      skhd:
+        autostart: this overrides config from tool_globl:users
 
 ######################################################################
 # The following settings define default values for this formula,

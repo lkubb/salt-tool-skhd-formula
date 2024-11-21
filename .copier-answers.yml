@@ -24,7 +24,8 @@ service_abbr: skhd
 service_name: skhd
 settings: {}
 user_settings:
-  someconf: someval
+  autostart: true
+  service_pathenv: null
 xdg_conffile: skhdrc
 xdg_dirname: skhd
 initialized: true

@@ -56,6 +56,17 @@ The following shows an example of ``tool_skhd`` per-user configuration. If provi
       # for this user (will be appended to a file relative to $HOME)
     rchook: '.config/zsh/zshrc'
 
+      # This user's configuration for this formula. Will be overridden by
+      # user-specific configuration in `tool_skhd:users`.
+      # Set this to `false` to disable configuration for this user.
+    skhd:
+        # Whether the skhd service should be installed and enabled
+        # for this user. Defaults to true.
+      autostart: true
+        # $PATH set in the user's service file.
+        # Defaults to the user's $PATH.
+      service_pathenv: null
+
 Formula-specific
 ^^^^^^^^^^^^^^^^
 
@@ -68,6 +79,10 @@ Formula-specific
       # by leaving version empty or setting it to 'latest'
       # (again for Linux, brew does that anyways).
     version: latest
+
+      # Default formula configuration for all users.
+    defaults:
+      autostart: default value for all users
 
 Dotfiles
 ~~~~~~~~
