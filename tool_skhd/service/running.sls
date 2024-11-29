@@ -57,10 +57,9 @@ skhd service is running:
   service.running:
     - name: {{ skhd.lookup.service.name }}
     - enable: true
-    - require:
+    - watch:
       - skhd service is loaded during login for user '{{ user.name }}'
 {%-     if user.dotconfig %}
-    - watch:
       - skhd configuration is synced for user '{{ user.name }}'
 {%-     endif %}
 {%-   endif %}
